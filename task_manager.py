@@ -9,9 +9,11 @@
 import os
 from datetime import datetime, date
     
-# Reads task_overview and user_overview
+# Reads task_overview and user_overview.
 def user_read():
-        # Create tasks.txt if it doesn't exist
+    
+    
+        # Create tasks.txt if it doesn't exist.
     if not os.path.exists("task_overview.txt"):
         with open("task_overview.txt", "w") as task_over:
             pass
@@ -60,8 +62,11 @@ def user_read():
             
         user_report.append(total_u)
 
+
 # Displays values of task_list.               
 def disp_task(t):
+    #Prints out users tasks.
+    
     disp_str = f"Id number: \t\t{t['task_id']} \n\n"
     disp_str += f"Task: \t\t {t['title']}\n"
     disp_str += f"Assigned to: \t {t['username']}\n"
@@ -94,15 +99,21 @@ def task_write():
         task_file.write("\n".join(task_list_to_write))
 
 
+# Allows the user to update the selected task.
 def task_update(select_task):
+    
     
     task_username = input("Name of person assigned to task: ")
     
+    # Checks username then allows input
     if task_username not in username_password.keys():
         print("User does not exist. Please enter a valid username")
+        
     else:
+        
         task_title = input("Title of Task: ")
         task_description = input("Description of Task: ")
+        
         while True:
             try:
                 task_due_date = input("Due date of task (YYYY-MM-DD): ")
@@ -113,7 +124,7 @@ def task_update(select_task):
                 print("Invalid datetime format. Please use the format specified")
 
         
-            # Then get the current date.
+             
         curr_date = date.today()
         
         # Add the data to the file task.txt and
@@ -131,8 +142,12 @@ def task_update(select_task):
         for i in task_list[select_task]:
             task_list[select_task].update(new_task)
 
-#Registers New user         
+
+# Registers New user.    
 def reg_user():
+       
+    # Input new username and password.
+    # Writes new username and password to user.txt.
     
 
     new_username = input("New Username: ")
@@ -162,7 +177,9 @@ def reg_user():
             # - Otherwise you present a relevant message.
         else:
             print("Passwords do no match")
-     
+ 
+
+# Add task. 
 def add_task():
     '''Allow a user to add a new task to task.txt file
     Prompt a user for the following: 
@@ -198,7 +215,7 @@ def add_task():
             # Then get the current date.
         curr_date = date.today()
         
-        # Creates task_id
+        # Creates task_id.
         user_id = 1
         for i in task_list:
             user_id += 1
@@ -218,6 +235,8 @@ def add_task():
         task_list.append(new_task)
         task_write()
 
+
+# View all tasks.
 def view_all():
     
     '''Reads the task from task.txt file and prints to the console in the 
@@ -236,6 +255,8 @@ def view_all():
             print(disp_str)
             print("-------------------------------------------------------------------\n")
 
+
+# View tasks assigned to current user.
 def view_mine():
     
     '''Reads the task from task.txt file and prints to the console in the 
@@ -249,6 +270,8 @@ def view_mine():
     # Searches task_list for current username.
     for t in task_list: 
         
+        # If username is the same as the current username.
+        # Print tasks.
         if t['username'] == curr_user:
             disp_task(t)
             print("-------------------------------------------------------------------\n")
@@ -262,20 +285,35 @@ def view_mine():
     # Enter -1 to exit.
     while select_task != "-1":
         
+    # Makes sure that the index is within range.
+    
         # Checking input is a number.
         if str(select_task).isdigit():
             select_task = int(select_task)-1
-            
-        # Gets username and task Id number. 
-        user = task_list[select_task]['username']
-        user_task = task_list[select_task]['task_id']
+           
+           # Checks to see if the task selected is in range. 
+            if select_task < len(task_list):
+                
+                # Gets username and task Id number. 
+                user = task_list[select_task]['username']
+                user_task = task_list[select_task]['task_id']
+                
+                 # Turns select_task to task_id string.
+                str_task = (select_task)+1
+                task_id = str(str_task)
+                
+            else:
+                print("Please select a valid task.")
+                break
+        else:
+            print("Please enter a valid ID number.")
+            break
+                
         
-        # Turns select_task to a string.
-        str_task = (select_task)+1
-        task_id = str(str_task)
-        
+    
         # Checks input valid to task_id and task username is same as current user.
         if task_id == user_task and user == curr_user:
+            
             for t in task_list:
                 if t['task_id'] == task_id:
                     disp_task(t) 
@@ -285,21 +323,24 @@ def view_mine():
             break
         
         completed = input("Have you completed this task (y or n): ")
+        print()
         
         
         # Change complete to yes.
         if completed == "y":
-                    
+            
+            # Update task completed to True.       
             task_list[select_task].update({'completed': True})
             task_write()
 
             print("\nTask successfully updated.")
-            disp_task(t)
+            
         
-        #Allow user to edit task.    
+        # Allow user to edit task.    
         elif completed == "n":
             
             update = input("\nWould you like to update this task (y/n): ")
+            
             if update =="y":
                 task_update(select_task)
                 task_write()
@@ -312,12 +353,21 @@ def view_mine():
         break
 
  #-------------------------------------------------------------------------------------------------             
-            
+ 
+ 
+# Log number of task for whole system and user.          
 def gen_reports():
+    '''
+    Works out how many tasks are in the system.
+    How many tasks are complete and uncomplete.
+    How many are overdue.
+    Does the same for current user.
+    Also works out percentage of tasks are for the current user.
+    '''
 
     # Creates or opens task & user overview.txt
     user_read()
-  
+    # Variables to keep count 
     num_of_task = 0
     task_comp = 0
     task_uncomp = 0
@@ -381,6 +431,8 @@ def gen_reports():
             report_list_to_write.append(";".join(str_attrs))
         task_over.write("\n".join(report_list_to_write))  
     
+    
+    # Displays to console.
     print("----------------Generate--Reports-------------------------\n")
     for t in report:
         disp_str = f"Current tasks:\t\t{t['amount']}\n"
@@ -433,14 +485,18 @@ def gen_reports():
         disp_str += f"You still have {t['percent_not_comp']}% to complete.\n"
         disp_str += f"You have {t['percent_overdue']}% of your tasks overdue.\n"
         print(disp_str)
-    print("-----------------------------------------------------\n\n")
+    print("-------------------------------------------------------------------\n\n")
             
             
   #-------------------------------------------------------------------------------      
-    
+
+
+# Allows admin to see everything that has been recorded.
 def statistics():
     
-    # Gets info  from user and task .txt.
+    # Gets info from user.txt and task.txt.
+    # Prints out the username and password.
+    # Prints all tasks to do with that user.
     for u in user_details:
         print(f"Username: \t {u['username']} \t\t  Password: {u['password']}\n")
         print("-------------------------------------------------------------------\n")
@@ -536,7 +592,7 @@ while not logged_in:
         continue
     else:
         print("Login Successful!")
-        logged_in = True
+        logged_in = True 
 
 
 while True:
@@ -553,6 +609,7 @@ gr - Generate reports
 ds - Display statistics
 e - Exit
 : ''').lower()
+    print()
 
     if menu == 'r':
         reg_user()
